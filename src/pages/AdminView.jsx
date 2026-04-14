@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { setEventData, updateTeamScore, resetSubmissions, db } from '../firebase';
+import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, db } from '../firebase';
 import { ref, set } from 'firebase/database';
-import { Settings, Play, Square, RefreshCcw, Save, Trash2, Layout, Database, TrendingUp, HelpCircle } from 'lucide-react';
+import { Settings, Play, Square, RefreshCcw, Save, Trash2, Layout, Database, TrendingUp, HelpCircle, Eraser } from 'lucide-react';
 
 const AdminView = ({ eventData, teams }) => {
   const [password, setPassword] = useState('');
@@ -60,6 +60,16 @@ const AdminView = ({ eventData, teams }) => {
     set(ref(db, 'teams'), initial);
   };
 
+  const handleWipeData = async () => {
+    if (window.confirm("This will erase ALL templates and submissions. Continue?")) {
+      try {
+        await wipeProjectData();
+      } catch (err) {
+        alert("Failed to wipe data");
+      }
+    }
+  };
+
   return (
     <div className="max-w-7xl p-6 lg:p-12 flex flex-col gap-12 animate-reveal">
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 glass-card p-8">
@@ -67,11 +77,16 @@ const AdminView = ({ eventData, teams }) => {
           <h1 className="text-3xl font-black heading flex items-center gap-4">
             <Layout className="text-neon-primary" /> Command Console
           </h1>
-          <p className="text-secondary text-xs font-bold tracking-widest uppercase mt-2">Operation Meme War // V1.0.5</p>
+          <p className="text-secondary text-xs font-bold tracking-widest uppercase mt-2">Operation Meme War // V1.0.6</p>
         </div>
-        <button onClick={initializeTeams} className="btn-secondary">
-          <RefreshCcw size={14} /> Full System Reset
-        </button>
+        <div className="flex gap-4">
+          <button onClick={handleWipeData} className="btn-secondary border-neon-pink text-neon-pink">
+            <Eraser size={14} /> Wipe Templates/Subs
+          </button>
+          <button onClick={initializeTeams} className="btn-secondary">
+            <RefreshCcw size={14} /> Full System Reset
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

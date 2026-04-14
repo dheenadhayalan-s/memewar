@@ -43,9 +43,12 @@ const ParticipantView = ({ eventData, teams }) => {
                 <span className="text-xs font-bold py-1 px-3 bg-neon-cyan opacity-20 rounded-full text-neon-cyan uppercase tracking-widest flex items-center gap-2">
                    <Activity size={10} /> Rank #{rank}
                 </span>
-                <span className="text-xs font-bold py-1 px-3 bg-neon-primary opacity-20 rounded-full text-neon-primary uppercase tracking-widest flex items-center gap-2">
-                   <User size={10} /> Active
-                </span>
+                <button 
+                  onClick={() => { localStorage.removeItem('teamId'); window.location.href = '/login'; }}
+                  className="text-xs font-bold py-1 px-3 bg-white opacity-10 hover:opacity-30 rounded-full text-white uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer"
+                >
+                   Switch Squad
+                </button>
             </div>
         </div>
         

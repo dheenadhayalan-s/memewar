@@ -1,16 +1,24 @@
 import React, { useState, useMemo } from 'react';
 import { updateTeamScore, selectWinners, setEventData } from '../firebase';
-import { CheckCircle, Trophy, Medal, Star, Clock, Image as ImageIcon } from 'lucide-react';
+import { Trophy, Star, Clock, Image as ImageIcon } from 'lucide-react';
 
 const SelectorView = ({ eventData, teams }) => {
   const teamId = localStorage.getItem('teamId');
   const [selections, setSelections] = useState({ first: '', second: '', third: '' });
   const [isLocked, setIsLocked] = useState(false);
 
+  // ALL HOOKS MUST BE AT THE TOP - Fixed the "Rendered more hooks" error
+  const shuffledSubmissions = useMemo(() => {
+    const caps = Object.entries(eventData?.submissions || {})
+      .filter(([id]) => id !== teamId)
+      .map(([id, caption]) => ({ id, caption }));
+    return caps.sort(() => Math.random() - 0.5);
+  }, [eventData?.submissions, teamId]);
+
   if (eventData.currentSelector !== teamId) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center animate-reveal">
-        <div className="glass-card p-12 max-w-lg border-neon-pink">
+        <div className="glass-card p-12 max-w-lg border-primary">
           <Trophy size={60} className="m-auto mb-6 text-neon-pink" />
           <h2 className="text-3xl font-bold mb-4">ACCESS RESTRICTED</h2>
           <p className="text-secondary leading-relaxed uppercase tracking-widest text-xs">
@@ -43,17 +51,31 @@ const SelectorView = ({ eventData, teams }) => {
     });
   };
 
+  const submitFinalSelection = async () => {
+    if (!selections.first || !selections.second || !selections.third) return;
+    try {
+      const { first, second, third } = selections;
+      await updateTeamScore(first, { ...teams[first], r2: (teams[first]?.r2 || 0) + 5 });
+      await updateTeamScore(second, { ...teams[second], r2: (teams[second]?.r2 || 0) + 3 });
+      await updateTeamScore(third, { ...teams[third], r2: (teams[third]?.r2 || 0) + 2 });
+      await selectWinners(selections);
+      setIsLocked(true);
+    } catch (err) {
+      alert("Error finalizing rankings");
+    }
+  };
+
+  // Selection View
   if (!eventData.template) {
     const availableTemplates = eventData.availableTemplates || [];
-
     return (
-      <div className="flex flex-col gap-8 mt-12 animate-reveal">
+      <div className="flex flex-col gap-8 animate-reveal">
         <div className="text-center flex flex-col gap-4">
           <h1 className="text-4xl font-black text-gradient uppercase italic">Choose Battleground</h1>
           <p className="text-secondary text-xs uppercase tracking-widest">Select target meme for other squads.</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl m-auto px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
            {availableTemplates.map((url, i) => (
               <div 
                 key={i}
@@ -77,29 +99,9 @@ const SelectorView = ({ eventData, teams }) => {
     );
   }
 
-  const shuffledSubmissions = useMemo(() => {
-    const caps = Object.entries(eventData.submissions || {})
-      .filter(([id]) => id !== teamId)
-      .map(([id, caption]) => ({ id, caption }));
-    return caps.sort(() => Math.random() - 0.5);
-  }, [eventData.submissions, teamId]);
-
-  const submitFinalSelection = async () => {
-    if (!selections.first || !selections.second || !selections.third) return;
-    try {
-      const { first, second, third } = selections;
-      await updateTeamScore(first, { ...teams[first], r2: (teams[first]?.r2 || 0) + 5 });
-      await updateTeamScore(second, { ...teams[second], r2: (teams[second]?.r2 || 0) + 3 });
-      await updateTeamScore(third, { ...teams[third], r2: (teams[third]?.r2 || 0) + 2 });
-      await selectWinners(selections);
-      setIsLocked(true);
-    } catch (err) {
-      alert("Error finalizing rankings");
-    }
-  };
-
+  // Judging View
   return (
-    <div className="flex flex-col gap-12 mt-12 animate-reveal pb-32">
+    <div className="flex flex-col gap-12 animate-reveal pb-32">
       <header className="text-center flex flex-col gap-4">
         <div className="m-auto flex items-center gap-3 px-4 py-1 rounded-full bg-neon-primary bg-opacity-10 border border-neon-primary border-opacity-20 text-neon-primary text-xs font-bold uppercase tracking-widest">
             <Star size={12} /> Judging Panel
@@ -108,7 +110,7 @@ const SelectorView = ({ eventData, teams }) => {
         <p className="text-secondary text-xs uppercase tracking-widest">Identify top transmissions.</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl m-auto px-4 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
         {shuffledSubmissions.map((sub, index) => {
           const rank = Object.keys(selections).find(k => selections[k] === sub.id);
           const rankLabel = rank === 'first' ? '1ST' : rank === 'second' ? '2ND' : rank === 'third' ? '3RD' : null;
@@ -147,7 +149,7 @@ const SelectorView = ({ eventData, teams }) => {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-6 z-50">
-          <div className="max-w-6xl m-auto glass-card p-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="max-w-6xl m-auto glass-card p-6 flex flex-col md:flex-row justify-between items-center gap-8 shadow-2xl">
                 <div className="flex gap-8 items-center">
                     <span className={`text-xs font-black uppercase tracking-widest ${selections.first ? 'text-neon-emerald' : 'text-secondary opacity-30'}`}>GOLD</span>
                     <span className={`text-xs font-black uppercase tracking-widest ${selections.second ? 'text-neon-cyan' : 'text-secondary opacity-30'}`}>SILVER</span>
@@ -159,7 +161,7 @@ const SelectorView = ({ eventData, teams }) => {
                   disabled={isLocked || !selections.first || !selections.second || !selections.third}
                   className={`btn-primary px-12 ${isLocked || !selections.first || !selections.second || !selections.third ? 'opacity-30' : ''}`}
                 >
-                  {isLocked ? 'Selection Locked' : 'Finalize Sync'}
+                   {isLocked ? 'Selection Locked' : 'Finalize Sync'}
                 </button>
           </div>
       </div>

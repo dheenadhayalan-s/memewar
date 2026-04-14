@@ -40,3 +40,11 @@ export const resetSubmissions = () => {
 export const selectWinners = (winners) => {
   return update(ref(db, `event/rankings`), winners);
 };
+export const wipeProjectData = () => {
+  return update(ref(db, 'event'), {
+    submissions: {},
+    availableTemplates: [],
+    template: null,
+    rankings: null
+  });
+};
