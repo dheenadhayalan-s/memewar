@@ -7,7 +7,11 @@ async function run() {
   const data = await resp.json();
   
   if (data.success) {
-    const newTemplates = data.data.memes.slice(0, 50).map(m => m.url);
+    // Filter memes to only those that are easily captionable in one sentence (box_count <= 2)
+    const newTemplates = data.data.memes
+      .filter(m => m.box_count <= 2)
+      .slice(0, 100)
+      .map(m => m.url);
     
     // Fetch existing so we don't overwrite
     const eventSnap = await get(ref(db, 'event/availableTemplates'));
@@ -16,7 +20,7 @@ async function run() {
     // Merge unique
     const merged = [...new Set([...existing, ...newTemplates])];
     
-    console.log(`Uploading ${merged.length} templates (added ${newTemplates.length}) to Firebase...`);
+    console.log(`Uploading ${merged.length} templates (added ${newTemplates.length} easy-caption memes) to Firebase...`);
     await update(ref(db, 'event'), { availableTemplates: merged });
     console.log("Done! Memes successfully injected.");
   } else {
