@@ -20,11 +20,11 @@ const SelectorView = ({ eventData, teams }) => {
       <div className="flex flex-col items-center justify-center p-8 text-center animate-reveal">
         <div className="glass-card p-12 max-w-lg border-primary">
           <Trophy size={60} className="m-auto mb-6 text-neon-pink" />
-          <h2 className="text-3xl font-bold mb-4">ACCESS RESTRICTED</h2>
+          <h2 className="text-3xl font-bold mb-4 uppercase">Wait Your Turn</h2>
           <p className="text-secondary leading-relaxed uppercase tracking-widest text-xs">
-            Only <span className="text-neon-cyan font-bold">Team {eventData.currentSelector}</span> is authorized to judge.
+            Only <span className="text-neon-cyan font-bold">Team {eventData.currentSelector}</span> is allowed to pick winners right now.
           </p>
-          <button onClick={() => window.location.href = '/team'} className="btn-primary mt-8">Return</button>
+          <button onClick={() => window.location.href = '/team'} className="btn-primary mt-8">Go Back</button>
         </div>
       </div>
     );
@@ -71,8 +71,8 @@ const SelectorView = ({ eventData, teams }) => {
     return (
       <div className="flex flex-col gap-8 animate-reveal">
         <div className="text-center flex flex-col gap-4">
-          <h1 className="text-4xl font-black text-gradient uppercase italic">Choose Battleground</h1>
-          <p className="text-secondary text-xs uppercase tracking-widest">Select target meme for other squads.</p>
+          <h1 className="text-4xl font-black text-gradient uppercase italic">Pick a Meme</h1>
+          <p className="text-secondary text-xs uppercase tracking-widest">Choose the image everyone will write a caption for.</p>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -91,7 +91,7 @@ const SelectorView = ({ eventData, teams }) => {
            {availableTemplates.length === 0 && (
               <div className="col-span-full py-20 glass-card text-center flex flex-col items-center gap-4 opacity-50">
                   <ImageIcon size={48} className="text-secondary" />
-                  <p className="text-secondary uppercase tracking-widest text-xs font-bold">Awaiting templates from Command...</p>
+                  <p className="text-secondary uppercase tracking-widest text-xs font-bold">Waiting for admin to add memes...</p>
               </div>
            )}
         </div>
@@ -104,10 +104,10 @@ const SelectorView = ({ eventData, teams }) => {
     <div className="flex flex-col gap-12 animate-reveal pb-32">
       <header className="text-center flex flex-col gap-4">
         <div className="m-auto flex items-center gap-3 px-4 py-1 rounded-full bg-neon-primary bg-opacity-10 border border-neon-primary border-opacity-20 text-neon-primary text-xs font-bold uppercase tracking-widest">
-            <Star size={12} /> Judging Panel
+            <Star size={12} /> Judge Panel
         </div>
-        <h1 className="text-4xl font-black text-gradient uppercase italic">The High Judge</h1>
-        <p className="text-secondary text-xs uppercase tracking-widest">Identify top transmissions.</p>
+        <h1 className="text-4xl font-black text-gradient uppercase italic">Pick Winners</h1>
+        <p className="text-secondary text-xs uppercase tracking-widest">Select the best 3 captions below.</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
@@ -127,7 +127,7 @@ const SelectorView = ({ eventData, teams }) => {
               )}
 
               <div className="flex flex-col gap-4">
-                <span className="text-xs font-bold text-secondary uppercase tracking-widest">Protocol Line #{index + 1}</span>
+                <span className="text-xs font-bold text-secondary uppercase tracking-widest">Entry #{index + 1}</span>
                 <p className="text-xl font-bold italic text-white">"{sub.caption}"</p>
                 
                 <div className="flex gap-4 pt-4 border-t border-white border-opacity-5">
@@ -143,7 +143,7 @@ const SelectorView = ({ eventData, teams }) => {
         {shuffledSubmissions.length === 0 && (
           <div className="col-span-full h-80 glass-card flex flex-col items-center justify-center gap-6 opacity-50">
             <Clock size={40} className="text-neon-primary" />
-            <p className="uppercase tracking-widest text-xs font-bold">Scanning for squad signals...</p>
+            <p className="uppercase tracking-widest text-xs font-bold">Waiting for others to submit captions...</p>
           </div>
         )}
       </div>
@@ -161,7 +161,7 @@ const SelectorView = ({ eventData, teams }) => {
                   disabled={isLocked || !selections.first || !selections.second || !selections.third}
                   className={`btn-primary px-12 ${isLocked || !selections.first || !selections.second || !selections.third ? 'opacity-30' : ''}`}
                 >
-                   {isLocked ? 'Selection Locked' : 'Finalize Sync'}
+                   {isLocked ? 'Rankings Locked' : 'Submit Rankings'}
                 </button>
           </div>
       </div>

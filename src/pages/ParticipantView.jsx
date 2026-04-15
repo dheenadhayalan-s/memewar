@@ -76,13 +76,13 @@ const ParticipantView = ({ eventData, teams }) => {
             <div className="glass-card p-8 bg-neon-primary bg-opacity-5">
                 <div className="flex items-center gap-3 mb-4">
                     <Clock className="text-neon-primary" size={20} />
-                    <h3 className="heading text-xs text-secondary tracking-widest">Operation Status</h3>
+                    <h3 className="heading text-xs text-secondary tracking-widest uppercase">Round Status</h3>
                 </div>
                 <p className="text-3xl font-black italic">
                     {isRound2 ? (
-                        <span className="text-neon-pink">ROUND 02: CAPTION PROTOCOL</span>
+                        <span className="text-neon-pink">ROUND 2: CAPTION COMPETITION</span>
                     ) : (
-                        `ROUND 0${eventData?.currentRound || 1}: INITIAL STRIKE`
+                        `ROUND ${eventData?.currentRound || 1}: START`
                     )}
                 </p>
             </div>
@@ -93,7 +93,7 @@ const ParticipantView = ({ eventData, teams }) => {
                 ) : (
                     <div className="glass-card p-8 flex flex-col gap-8">
                         <div className="flex justify-between items-center">
-                            <h3 className="heading text-xl text-neon-pink">Meme Target</h3>
+                            <h2 className="heading text-xl text-neon-pink uppercase">Meme Image</h2>
                         </div>
 
                         {eventData?.template ? (
@@ -103,7 +103,7 @@ const ParticipantView = ({ eventData, teams }) => {
                         ) : (
                             <div className="h-64 glass-card flex flex-col items-center justify-center gap-4 opacity-50">
                                 <ImageIcon size={40} />
-                                <p className="text-xs font-bold tracking-widest uppercase text-secondary">Awaiting Target Intel...</p>
+                                <p className="text-xs font-bold tracking-widest uppercase text-secondary">Waiting for Meme...</p>
                             </div>
                         )}
 
@@ -111,28 +111,28 @@ const ParticipantView = ({ eventData, teams }) => {
                             alreadySubmitted ? (
                                 <div className="p-10 glass-card text-center">
                                     <Trophy size={48} className="text-neon-emerald m-auto mb-4" />
-                                    <p className="text-neon-emerald font-black uppercase tracking-widest text-lg">Infiltration Complete</p>
-                                    <p className="text-secondary text-sm mt-2 font-bold">Your caption is being evaluated by the judge.</p>
+                                    <p className="text-neon-emerald font-black uppercase tracking-widest text-lg">Entry Received!</p>
+                                    <p className="text-secondary text-sm mt-2 font-bold">Your caption is now being judged.</p>
                                 </div>
                             ) : (
                                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                                     <textarea 
-                                        placeholder="ENGAGE WIT..."
+                                        placeholder="Type your funny caption here..."
                                         value={caption}
                                         onChange={(e) => setCaption(e.target.value)}
                                         className="h-32"
                                         required
                                     />
                                     <button type="submit" className="btn-primary w-full py-5 text-xl">
-                                        <Send size={24} /> Transmit Caption
+                                        <Send size={24} /> Submit Caption
                                     </button>
                                 </form>
                             )
                         ) : (
                             <div className="p-12 glass-card text-center">
                                 <Clock size={40} className="text-neon-pink m-auto mb-4" />
-                                <p className="text-neon-pink font-black uppercase tracking-widest">Round Offline</p>
-                                <p className="text-secondary text-xs mt-2 font-bold">The submission window has been terminated.</p>
+                                <p className="text-neon-pink font-black uppercase tracking-widest">Submissions Closed</p>
+                                <p className="text-secondary text-xs mt-2 font-bold">The time to submit captions has ended.</p>
                             </div>
                         )}
                     </div>

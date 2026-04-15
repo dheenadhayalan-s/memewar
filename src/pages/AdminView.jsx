@@ -59,18 +59,18 @@ const AdminView = ({ eventData, teams }) => {
         <form onSubmit={handleLogin} className="glass-card p-10 w-full max-w-4xl space-y-8 animate-reveal">
           <div className="text-center">
              <Settings className="text-neon-primary mb-4 m-auto" size={48} />
-             <h2 className="text-4xl font-black heading">System Core</h2>
-             <p className="text-secondary text-xs font-bold uppercase tracking-widest mt-4">Authorization Required</p>
+             <h2 className="text-4xl font-black heading">Admin Login</h2>
+             <p className="text-secondary text-xs font-bold uppercase tracking-widest mt-4">Please enter your password</p>
           </div>
           <div className="flex flex-col gap-4">
              <input 
                type="password" 
-               placeholder="ACCESS KEY" 
+               placeholder="PASSWORD" 
                value={password}
                onChange={(e) => setPassword(e.target.value)}
                className="text-center"
              />
-             <button type="submit" className="btn-primary w-full py-4 text-xl">Initialize Control</button>
+             <button type="submit" className="btn-primary w-full py-4 text-xl">Login</button>
           </div>
         </form>
       </div>
@@ -165,13 +165,13 @@ const AdminView = ({ eventData, teams }) => {
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 glass-card p-8">
         <div>
           <h1 className="text-3xl font-black heading flex items-center gap-4">
-            <Layout className="text-neon-primary" /> Command Console
+            <Layout className="text-neon-primary" /> Admin Dashboard
           </h1>
-          <p className="text-secondary text-xs font-bold tracking-widest uppercase mt-2">Operation Meme War // V1.0.6</p>
+          <p className="text-secondary text-xs font-bold tracking-widest uppercase mt-2">Meme War Control Center // 2026</p>
         </div>
         <div className="flex gap-4">
           <button onClick={handleWipeData} className="btn-secondary border-neon-pink text-neon-pink">
-            <Eraser size={14} /> Wipe Templates/Subs
+            <Eraser size={14} /> Reset Round Data
           </button>
         </div>
       </header>
@@ -201,7 +201,7 @@ const AdminView = ({ eventData, teams }) => {
           <form onSubmit={handleCreateTeam} className="glass-card p-6">
             <div className="flex items-center gap-2 mb-4">
               <UserPlus size={16} style={{ color: '#10b981' }} />
-              <h3 className="heading text-xs tracking-widest" style={{ color: '#10b981' }}>Deploy New Squad</h3>
+              <h3 className="heading text-xs tracking-widest uppercase" style={{ color: '#10b981' }}>Add New Team</h3>
             </div>
             <div className="grid grid-cols-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
               <div className="flex flex-col gap-2">
@@ -241,8 +241,8 @@ const AdminView = ({ eventData, teams }) => {
               disabled={creatingTeam}
               style={{ padding: '1rem', fontSize: '0.85rem' }}
             >
-              <UserPlus size={18} />
-              {creatingTeam ? 'Deploying...' : 'Deploy Squad'}
+              <Plus size={18} />
+              {creatingTeam ? 'Adding...' : 'Add Team'}
             </button>
           </form>
 
@@ -336,7 +336,7 @@ const AdminView = ({ eventData, teams }) => {
         {/* Event State Controls */}
         <section className="glass-card p-8 flex flex-col gap-8 lg:col-span-1">
           <div className="flex items-center justify-between">
-            <h2 className="heading text-xs text-neon-emerald flex items-center gap-2"><Database size={14}/> Event Matrix</h2>
+            <h2 className="heading text-xs text-neon-emerald flex items-center gap-2 uppercase"><Database size={14}/> Event Status</h2>
             <div className={`w-3 h-3 rounded-full ${eventData.submissionOpen ? 'bg-neon-emerald' : 'bg-neon-pink'}`}></div>
           </div>
           
@@ -361,13 +361,13 @@ const AdminView = ({ eventData, teams }) => {
                   onClick={() => setEventData({ submissionOpen: true })}
                   className="btn-primary"
                 >
-                  <Play size={18} /> Deploy Uplink
+                  <Play size={18} /> Open Submissions
                 </button>
                 <button 
                   onClick={() => setEventData({ submissionOpen: false })}
                   className="btn-secondary"
                 >
-                  <Square size={18} /> Terminate Uplink
+                  <Square size={18} /> Close Submissions
                 </button>
             </div>
 
@@ -379,16 +379,16 @@ const AdminView = ({ eventData, teams }) => {
 
         {/* Round 2 Mini Round Matrix */}
         <section className="glass-card p-8 lg:col-span-2 flex flex-col gap-8">
-          <h2 className="heading text-xs text-neon-primary flex items-center gap-2"><TrendingUp size={14}/> Round 02 Protocol</h2>
+          <h2 className="heading text-xs text-neon-primary flex items-center gap-2 uppercase"><TrendingUp size={14}/> Round 2 Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col gap-4">
-              <label className="text-xs text-secondary uppercase font-bold tracking-widest">Active Selector Squad</label>
+              <label className="text-xs text-secondary uppercase font-bold tracking-widest">Selector Team</label>
               <select 
                 value={eventData.currentSelector || ''}
                 onChange={(e) => setEventData({ currentSelector: e.target.value })}
                 className="w-full"
               >
-                <option value="">AWAITING SELECTION</option>
+                <option value="">CHOOSE SELECTOR</option>
                 {Object.keys(teams).sort().map(id => <option key={id} value={id}>TEAM {id}</option>)}
               </select>
             </div>
@@ -463,7 +463,7 @@ const AdminView = ({ eventData, teams }) => {
           )}
 
           <div className="pt-6 border-t border-white/5">
-             <label className="text-xs text-secondary uppercase font-bold tracking-widest mb-4 block">Available Template Pool</label>
+             <label className="text-xs text-secondary uppercase font-bold tracking-widest mb-4 block">Meme Templates</label>
              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {(eventData.availableTemplates || []).map((url, index) => (
                     <div key={index} className="relative group min-w-[120px] h-[120px] glass-card p-2 shrink-0">
@@ -480,7 +480,7 @@ const AdminView = ({ eventData, teams }) => {
                         </button>
                     </div>
                 ))}
-                {!(eventData.availableTemplates || []).length && <p className="text-secondary text-xs uppercase font-bold opacity-30 italic">No images in pool</p>}
+                {!(eventData.availableTemplates || []).length && <p className="text-secondary text-xs uppercase font-bold opacity-30 italic">No images added</p>}
              </div>
           </div>
         </section>
@@ -490,16 +490,16 @@ const AdminView = ({ eventData, teams }) => {
         {/* Round 1 Scoring */}
         <section className="glass-card overflow-hidden">
           <div className="p-8 border-b border-white/5">
-            <h2 className="heading text-xs text-neon-cyan tracking-widest">R01: Rapid Score Matrix</h2>
+            <h2 className="heading text-xs text-neon-cyan tracking-widest uppercase">Round 1 Scores</h2>
           </div>
           <div className="overflow-x-auto p-4">
             <table>
               <thead>
                 <tr>
-                  <th>Codename</th>
-                  <th>Hits (x5)</th>
+                  <th>Team</th>
+                  <th>Correct (x5)</th>
                   <th>Skips</th>
-                  <th>Sync</th>
+                  <th>Save</th>
                 </tr>
               </thead>
               <tbody>
@@ -519,17 +519,17 @@ const AdminView = ({ eventData, teams }) => {
         {/* Round 3 Scoring */}
         <section className="glass-card overflow-hidden">
           <div className="p-8 border-b border-white/5">
-            <h2 className="heading text-xs text-neon-pink tracking-widest">R03: Showdown Matrix</h2>
+            <h2 className="heading text-xs text-neon-pink tracking-widest uppercase">Round 3 Scores</h2>
           </div>
           <div className="overflow-x-auto p-4">
             <table>
               <thead>
                 <tr>
-                  <th>Codename</th>
-                  <th>Hum (20)</th>
-                  <th>Cre (20)</th>
-                  <th>Rel (10)</th>
-                  <th>Sync</th>
+                  <th>Team</th>
+                  <th>Humor (20)</th>
+                  <th>Creativity (20)</th>
+                  <th>Relevance (10)</th>
+                  <th>Save</th>
                 </tr>
               </thead>
               <tbody>
@@ -537,7 +537,7 @@ const AdminView = ({ eventData, teams }) => {
                   <tr key={id}>
                     <td className="font-bold text-neon-pink">Team {id}</td>
                     <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], humor: e.target.value}})} className="w-16" /></td>
-                    <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], creative: e.target.value}})} className="w-16" /></td>
+                    <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], creativity: e.target.value}})} className="w-16" /></td>
                     <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], relevance: e.target.value}})} className="w-16" /></td>
                     <td><button onClick={() => saveR3Score(id)} className="btn-secondary"><Save size={16} /></button></td>
                   </tr>
