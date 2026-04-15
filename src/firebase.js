@@ -46,7 +46,8 @@ export const clearSessionData = () => {
     submissions: {},
     template: null,
     rankings: null,
-    submissionOpen: false
+    submissionOpen: false,
+    showMiniRoundResults: false
   });
 };
 
@@ -56,7 +57,8 @@ export const wipeProjectData = () => {
     availableTemplates: [],
     template: null,
     rankings: null,
-    submissionOpen: false
+    submissionOpen: false,
+    showMiniRoundResults: false
   });
 };
 

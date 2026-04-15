@@ -423,11 +423,24 @@ const AdminView = ({ eventData, teams }) => {
                 </div>
               </div>
 
-              <div className="p-4 border border-white border-opacity-10 rounded-xl bg-black bg-opacity-20">
-                <p className="text-[10px] text-secondary uppercase font-bold mb-2">Current Activity</p>
-                <p className="text-sm font-bold">
-                  {Object.keys(eventData?.submissions || {}).length} Captions Received
-                </p>
+              <div className="p-4 border border-white border-opacity-10 rounded-xl bg-black bg-opacity-20 flex flex-col gap-3">
+                <p className="text-[10px] text-secondary uppercase font-bold mb-1">Mini Round Control</p>
+                <div className="flex gap-2">
+                   <button 
+                     onClick={() => setEventData({ showMiniRoundResults: true })}
+                     className="btn-primary flex-1 text-[10px] py-2"
+                     disabled={!eventData?.rankings?.first}
+                     style={(!eventData?.rankings?.first) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                   >
+                     End & Show Winners
+                   </button>
+                   <button 
+                     onClick={handleResetSession}
+                     className="btn-secondary flex-1 text-[10px] py-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:bg-opacity-10"
+                   >
+                     Start Next Mini Round
+                   </button>
+                </div>
               </div>
           </div>
             <div className="flex flex-col gap-4">
