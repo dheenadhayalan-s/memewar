@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams } from '../firebase';
+import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams, clearSessionData } from '../firebase';
 import { Settings, Play, Square, Save, Trash2, Layout, Database, TrendingUp, Eraser, UserPlus, Users, X, Eye, EyeOff, Globe, Search, Plus } from 'lucide-react';
 
 const AdminView = ({ eventData, teams }) => {
@@ -475,7 +475,6 @@ const AdminView = ({ eventData, teams }) => {
                     </button>
                 </div>
             </div>
-          </div>
 
           {showOnlineBrowser && (
             <div className="p-6 glass-card border-neon-secondary bg-neon-secondary bg-opacity-5 animate-reveal">

@@ -19,6 +19,13 @@ const ParticipantView = ({ eventData, teams }) => {
     }
   }, [teamId, teams, navigate]);
 
+  useEffect(() => {
+    if (!eventData?.template) {
+      setCaption('');
+      setSubmitted(false);
+    }
+  }, [eventData?.template]);
+
   if (!teamId) return <Navigate to="/login" />;
 
   const teamInfo = teams[teamId] || { r1: 0, r2: 0, r3: 0, total: 0 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { updateTeamScore, selectWinners, setEventData } from '../firebase';
 import { Trophy, Star, Clock, Image as ImageIcon } from 'lucide-react';
 
@@ -6,6 +6,13 @@ const SelectorView = ({ eventData, teams }) => {
   const teamId = localStorage.getItem('teamId');
   const [selections, setSelections] = useState({ first: '', second: '', third: '' });
   const [isLocked, setIsLocked] = useState(false);
+
+  useEffect(() => {
+    if (!eventData?.template) {
+      setSelections({ first: '', second: '', third: '' });
+      setIsLocked(false);
+    }
+  }, [eventData?.template]);
 
   // ALL HOOKS MUST BE AT THE TOP - Fixed the "Rendered more hooks" error
   const shuffledSubmissions = useMemo(() => {
