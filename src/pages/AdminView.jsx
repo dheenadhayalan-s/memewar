@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams } from '../firebase';
-import { Settings, Play, Square, Save, Trash2, Layout, Database, TrendingUp, Eraser, UserPlus, Users, X, Eye, EyeOff } from 'lucide-react';
+import { Settings, Play, Square, Save, Trash2, Layout, Database, TrendingUp, Eraser, UserPlus, Users, X, Eye, EyeOff, Globe, Search, Plus } from 'lucide-react';
 
 const AdminView = ({ eventData, teams }) => {
   const [password, setPassword] = useState('');
@@ -14,6 +14,38 @@ const AdminView = ({ eventData, teams }) => {
   const [newTeamPassword, setNewTeamPassword] = useState('');
   const [showPassword, setShowPassword] = useState({});
   const [creatingTeam, setCreatingTeam] = useState(false);
+
+  // Online template state
+  const [onlineTemplates, setOnlineTemplates] = useState([]);
+  const [showOnlineBrowser, setShowOnlineBrowser] = useState(false);
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchOnlineTemplates = async () => {
+    if (onlineTemplates.length > 0) {
+      setShowOnlineBrowser(!showOnlineBrowser);
+      return;
+    }
+    setIsFetching(true);
+    try {
+      const resp = await fetch('https://api.imgflip.com/get_memes');
+      const data = await resp.json();
+      if (data.success) {
+        setOnlineTemplates(data.data.memes);
+        setShowOnlineBrowser(true);
+      }
+    } catch (err) {
+      alert("Failed to reach template uplink");
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const addTemplateFromOnline = (url) => {
+    const current = eventData.availableTemplates || [];
+    if (current.includes(url)) return;
+    setEventData({ availableTemplates: [...current, url] });
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -361,30 +393,74 @@ const AdminView = ({ eventData, teams }) => {
               </select>
             </div>
             <div className="flex flex-col gap-4">
-                <label className="text-xs text-secondary uppercase font-bold tracking-widest">Uplink Target Template</label>
-                <div className="flex gap-2">
-                    <input 
-                        type="url" 
-                        placeholder="IMAGE URL" 
-                        id="new-template-url-admin"
-                        className="flex-1"
-                    />
+                <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                        <input 
+                            type="url" 
+                            placeholder="PASTE IMAGE URL" 
+                            id="new-template-url-admin"
+                            className="flex-1"
+                        />
+                        <button 
+                            onClick={() => {
+                                const input = document.getElementById('new-template-url-admin');
+                                if (input.value) {
+                                    const current = eventData.availableTemplates || [];
+                                    setEventData({ availableTemplates: [...current, input.value] });
+                                    input.value = '';
+                                }
+                            }}
+                            className="btn-primary"
+                        >
+                            <Plus size={18} />
+                        </button>
+                    </div>
                     <button 
-                        onClick={() => {
-                            const input = document.getElementById('new-template-url-admin');
-                            if (input.value) {
-                                const current = eventData.availableTemplates || [];
-                                setEventData({ availableTemplates: [...current, input.value] });
-                                input.value = '';
-                            }
-                        }}
-                        className="btn-primary"
+                      onClick={fetchOnlineTemplates}
+                      className="btn-secondary w-full text-[10px] py-2 border-dashed border-neon-secondary text-neon-secondary flex items-center justify-center gap-2"
+                      disabled={isFetching}
                     >
-                        +
+                      <Globe size={12} /> {isFetching ? 'FETCHING INTEL...' : 'BROWSE ONLINE TEMPLATES'}
                     </button>
                 </div>
             </div>
           </div>
+
+          {showOnlineBrowser && (
+            <div className="p-6 glass-card border-neon-secondary bg-neon-secondary bg-opacity-5 animate-reveal">
+               <div className="flex items-center gap-4 mb-6">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={14} />
+                    <input 
+                      type="text" 
+                      placeholder="SEARCH MEME DATABASE..."
+                      value={templateSearch}
+                      onChange={(e) => setTemplateSearch(e.target.value)}
+                      className="pl-10 text-xs py-2"
+                    />
+                  </div>
+                  <button onClick={() => setShowOnlineBrowser(false)} className="btn-secondary p-2 min-w-0">
+                    <X size={14} />
+                  </button>
+               </div>
+               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {onlineTemplates
+                    .filter(m => m.name.toLowerCase().includes(templateSearch.toLowerCase()))
+                    .map(meme => (
+                      <div 
+                        key={meme.id} 
+                        onClick={() => addTemplateFromOnline(meme.url)}
+                        className="relative cursor-pointer group rounded-lg overflow-hidden border border-white/5 hover:border-neon-secondary transition-all aspect-square"
+                      >
+                         <img src={meme.url} alt={meme.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                            <Plus size={20} className="text-neon-secondary" />
+                         </div>
+                      </div>
+                    ))}
+               </div>
+            </div>
+          )}
 
           <div className="pt-6 border-t border-white/5">
              <label className="text-xs text-secondary uppercase font-bold tracking-widest mb-4 block">Available Template Pool</label>
