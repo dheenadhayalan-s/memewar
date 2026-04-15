@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams, db } from '../firebase';
-import { ref, set } from 'firebase/database';
-import { Settings, Play, Square, RefreshCcw, Save, Trash2, Layout, Database, TrendingUp, HelpCircle, Eraser, UserPlus, Users, X, Shield, Eye, EyeOff } from 'lucide-react';
+import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams } from '../firebase';
+import { Settings, Play, Square, Save, Trash2, Layout, Database, TrendingUp, Eraser, UserPlus, Users, X, Eye, EyeOff } from 'lucide-react';
 
 const AdminView = ({ eventData, teams }) => {
   const [password, setPassword] = useState('');
@@ -58,14 +57,6 @@ const AdminView = ({ eventData, teams }) => {
     updateTeamScore(teamId, { ...teams[teamId], r3: score });
   };
 
-  const initializeTeams = () => {
-    if (!window.confirm("Format entire database? This wipes all scores.")) return;
-    const initial = {};
-    for (let i = 1; i <= 10; i++) {
-        initial[`T${i}`] = { r1: 0, r2: 0, r3: 0, total: 0 };
-    }
-    set(ref(db, 'teams'), initial);
-  };
 
   const handleWipeData = async () => {
     if (window.confirm("This will erase ALL templates and submissions. Continue?")) {
@@ -147,9 +138,6 @@ const AdminView = ({ eventData, teams }) => {
         <div className="flex gap-4">
           <button onClick={handleWipeData} className="btn-secondary border-neon-pink text-neon-pink">
             <Eraser size={14} /> Wipe Templates/Subs
-          </button>
-          <button onClick={initializeTeams} className="btn-secondary">
-            <RefreshCcw size={14} /> Full System Reset
           </button>
         </div>
       </header>
