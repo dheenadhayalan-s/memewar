@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams, clearSessionData } from '../firebase';
-import { Settings, Play, Square, Save, Trash2, Layout, Database, TrendingUp, Eraser, UserPlus, Users, X, Eye, EyeOff, Globe, Search, Plus } from 'lucide-react';
+import { Settings, Play, Square, Save, Trash2, Layout, Database, TrendingUp, Eraser, UserPlus, Users, X, Eye, EyeOff, Globe, Search, Plus, Star } from 'lucide-react';
 
 const AdminView = ({ eventData, teams }) => {
   const [password, setPassword] = useState('');
