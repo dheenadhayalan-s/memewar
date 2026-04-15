@@ -48,3 +48,24 @@ export const wipeProjectData = () => {
     rankings: null
   });
 };
+
+// Team Management Helpers
+export const createTeam = (teamId, teamData) => {
+  return set(ref(db, `teams/${teamId}`), {
+    name: teamData.name,
+    username: teamData.username,
+    password: teamData.password,
+    r1: 0,
+    r2: 0,
+    r3: 0,
+    total: 0,
+  });
+};
+
+export const deleteTeam = (teamId) => {
+  return remove(ref(db, `teams/${teamId}`));
+};
+
+export const deleteAllTeams = () => {
+  return set(ref(db, 'teams'), null);
+};

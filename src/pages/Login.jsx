@@ -1,17 +1,56 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Zap, Target } from 'lucide-react';
+import { db } from '../firebase';
+import { ref, onValue } from 'firebase/database';
+import { Shield, Zap, Target, Lock, User, AlertCircle } from 'lucide-react';
 
 const Login = () => {
-  const [selectedTeam, setSelectedTeam] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (selectedTeam) {
-      localStorage.setItem('teamId', selectedTeam);
-      navigate('/team');
+    if (!username.trim() || !password.trim()) {
+      setError('Enter both username and password');
+      return;
     }
+
+    setLoading(true);
+    setError('');
+
+    // Read all teams once to check credentials
+    const teamsRef = ref(db, 'teams');
+    onValue(teamsRef, (snapshot) => {
+      const teams = snapshot.val();
+      if (!teams) {
+        setError('No teams registered. Contact the admin.');
+        setLoading(false);
+        return;
+      }
+
+      // Find team matching username and password
+      let matchedTeamId = null;
+      for (const [teamId, teamData] of Object.entries(teams)) {
+        if (
+          teamData.username?.toLowerCase() === username.trim().toLowerCase() &&
+          teamData.password === password.trim()
+        ) {
+          matchedTeamId = teamId;
+          break;
+        }
+      }
+
+      if (matchedTeamId) {
+        localStorage.setItem('teamId', matchedTeamId);
+        navigate('/team');
+      } else {
+        setError('Invalid username or password');
+        setLoading(false);
+      }
+    }, { onlyOnce: true });
   };
 
   return (
@@ -25,23 +64,53 @@ const Login = () => {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
-            <label className="text-xs text-secondary font-black uppercase tracking-widest">Select Squad Identity</label>
-            <select 
-              value={selectedTeam}
-              onChange={(e) => setSelectedTeam(e.target.value)}
-              className="w-full text-center font-bold"
+            <label className="text-xs text-secondary font-black uppercase tracking-widest flex items-center gap-2">
+              <User size={12} /> Squad Username
+            </label>
+            <input
+              type="text"
+              placeholder="ENTER USERNAME"
+              value={username}
+              onChange={(e) => { setUsername(e.target.value); setError(''); }}
+              className="text-center font-bold"
+              autoComplete="username"
               required
-            >
-              <option value="" disabled>CHOOSE YOUR TEAM</option>
-              {Array.from({ length: 15 }, (_, i) => `T${i + 1}`).map(id => (
-                <option key={id} value={id}>SQUAD {id}</option>
-              ))}
-            </select>
+            />
           </div>
 
           <div className="flex flex-col gap-4">
-             <button type="submit" className="btn-primary w-full py-5 text-xl flex items-center justify-center gap-4">
-                <Target size={24} /> Initialize Sync
+            <label className="text-xs text-secondary font-black uppercase tracking-widest flex items-center gap-2">
+              <Lock size={12} /> Access Key
+            </label>
+            <input
+              type="password"
+              placeholder="ENTER PASSWORD"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
+              className="text-center font-bold"
+              autoComplete="current-password"
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="flex items-center justify-center gap-2 p-4 glass-card" style={{
+              borderColor: 'rgba(217, 70, 239, 0.4)',
+              background: 'rgba(217, 70, 239, 0.05)',
+            }}>
+              <AlertCircle size={16} style={{ color: 'var(--neon-accent)' }} />
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--neon-accent)' }}>{error}</span>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-4">
+             <button
+               type="submit"
+               className="btn-primary w-full py-5 text-xl flex items-center justify-center gap-4"
+               disabled={loading}
+               style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+             >
+                <Target size={24} /> {loading ? 'Authenticating...' : 'Initialize Sync'}
              </button>
              <p className="text-center text-[10px] text-secondary uppercase tracking-[0.2em] font-bold opacity-30 mt-4">
                 Connection established via Secure Uplink V.2.0

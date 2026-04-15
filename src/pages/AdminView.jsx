@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, db } from '../firebase';
+import { setEventData, updateTeamScore, resetSubmissions, wipeProjectData, createTeam, deleteTeam, deleteAllTeams, db } from '../firebase';
 import { ref, set } from 'firebase/database';
-import { Settings, Play, Square, RefreshCcw, Save, Trash2, Layout, Database, TrendingUp, HelpCircle, Eraser } from 'lucide-react';
+import { Settings, Play, Square, RefreshCcw, Save, Trash2, Layout, Database, TrendingUp, HelpCircle, Eraser, UserPlus, Users, X, Shield, Eye, EyeOff } from 'lucide-react';
 
 const AdminView = ({ eventData, teams }) => {
   const [password, setPassword] = useState('');
   const [isAuth, setIsAuth] = useState(false);
   const [r1Scores, setR1Scores] = useState({});
   const [r3Scores, setR3Scores] = useState({});
+
+  // Team creation form state
+  const [newTeamName, setNewTeamName] = useState('');
+  const [newTeamUsername, setNewTeamUsername] = useState('');
+  const [newTeamPassword, setNewTeamPassword] = useState('');
+  const [showPassword, setShowPassword] = useState({});
+  const [creatingTeam, setCreatingTeam] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -70,6 +77,64 @@ const AdminView = ({ eventData, teams }) => {
     }
   };
 
+  const handleCreateTeam = async (e) => {
+    e.preventDefault();
+    if (!newTeamName.trim() || !newTeamUsername.trim() || !newTeamPassword.trim()) {
+      alert('All fields are required');
+      return;
+    }
+
+    // Check for duplicate usernames
+    const existingUsernames = Object.values(teams).map(t => t.username?.toLowerCase());
+    if (existingUsernames.includes(newTeamUsername.trim().toLowerCase())) {
+      alert('Username already exists! Choose a different one.');
+      return;
+    }
+
+    setCreatingTeam(true);
+    try {
+      // Generate team ID from name (e.g., "Team Alpha" -> "TeamAlpha")
+      const teamId = newTeamName.trim().replace(/\s+/g, '');
+      await createTeam(teamId, {
+        name: newTeamName.trim(),
+        username: newTeamUsername.trim(),
+        password: newTeamPassword.trim(),
+      });
+      setNewTeamName('');
+      setNewTeamUsername('');
+      setNewTeamPassword('');
+    } catch (err) {
+      alert('Failed to create team: ' + err.message);
+    } finally {
+      setCreatingTeam(false);
+    }
+  };
+
+  const handleDeleteTeam = async (teamId) => {
+    if (!window.confirm(`Delete team "${teams[teamId]?.name || teamId}"? This cannot be undone.`)) return;
+    try {
+      await deleteTeam(teamId);
+    } catch (err) {
+      alert('Failed to delete team');
+    }
+  };
+
+  const handleDeleteAllTeams = async () => {
+    if (!window.confirm('DELETE ALL TEAMS? This will remove every team and their scores. This cannot be undone!')) return;
+    if (!window.confirm('Are you absolutely sure? Type thinking...')) return;
+    try {
+      await deleteAllTeams();
+    } catch (err) {
+      alert('Failed to delete all teams');
+    }
+  };
+
+  const togglePasswordVisibility = (teamId) => {
+    setShowPassword(prev => ({ ...prev, [teamId]: !prev[teamId] }));
+  };
+
+  const teamCount = Object.keys(teams).length;
+
   return (
     <div className="max-w-7xl p-6 lg:p-12 flex flex-col gap-12 animate-reveal">
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 glass-card p-8">
@@ -88,6 +153,162 @@ const AdminView = ({ eventData, teams }) => {
           </button>
         </div>
       </header>
+
+      {/* ═══════════════ TEAM MANAGEMENT SECTION ═══════════════ */}
+      <section className="glass-card overflow-hidden" style={{ borderColor: 'rgba(139, 92, 246, 0.3)' }}>
+        <div className="p-8 border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+          <div className="flex justify-between items-center">
+            <h2 className="heading text-xs tracking-widest flex items-center gap-2" style={{ color: 'var(--neon-primary)' }}>
+              <Users size={16} /> Team Management
+            </h2>
+            <div className="flex items-center gap-4">
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>
+                {teamCount} {teamCount === 1 ? 'Squad' : 'Squads'} Active
+              </span>
+              {teamCount > 0 && (
+                <button onClick={handleDeleteAllTeams} className="btn-secondary" style={{ borderColor: '#ef4444', color: '#ef4444', fontSize: '0.65rem' }}>
+                  <Trash2 size={12} /> Purge All
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-8 flex flex-col gap-8">
+          {/* Create Team Form */}
+          <form onSubmit={handleCreateTeam} className="glass-card p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <UserPlus size={16} style={{ color: '#10b981' }} />
+              <h3 className="heading text-xs tracking-widest" style={{ color: '#10b981' }}>Deploy New Squad</h3>
+            </div>
+            <div className="grid grid-cols-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>Team Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Team Alpha"
+                  value={newTeamName}
+                  onChange={(e) => setNewTeamName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>Username</label>
+                <input
+                  type="text"
+                  placeholder="e.g. alpha2026"
+                  value={newTeamUsername}
+                  onChange={(e) => setNewTeamUsername(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>Password</label>
+                <input
+                  type="text"
+                  placeholder="e.g. war@123"
+                  value={newTeamPassword}
+                  onChange={(e) => setNewTeamPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="btn-primary w-full mt-4"
+              disabled={creatingTeam}
+              style={{ padding: '1rem', fontSize: '0.85rem' }}
+            >
+              <UserPlus size={18} />
+              {creatingTeam ? 'Deploying...' : 'Deploy Squad'}
+            </button>
+          </form>
+
+          {/* Team List */}
+          {teamCount > 0 && (
+            <div className="overflow-x-auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Team Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Score</th>
+                    <th style={{ textAlign: 'right' }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(teams).sort(([a], [b]) => a.localeCompare(b)).map(([id, team]) => (
+                    <tr key={id}>
+                      <td className="font-bold" style={{ color: 'var(--neon-primary)' }}>{id}</td>
+                      <td className="font-bold">{team.name || id}</td>
+                      <td>
+                        <span style={{ 
+                          background: 'rgba(6, 182, 212, 0.1)',
+                          color: 'var(--neon-secondary)',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.8rem',
+                          fontFamily: 'monospace',
+                        }}>
+                          {team.username || '—'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <span style={{
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
+                            color: 'var(--text-dim)',
+                          }}>
+                            {showPassword[id] ? (team.password || '—') : '••••••••'}
+                          </span>
+                          {team.password && (
+                            <button
+                              onClick={() => togglePasswordVisibility(id)}
+                              style={{ 
+                                padding: '0.25rem',
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--text-dim)',
+                                cursor: 'pointer',
+                                minWidth: 'auto',
+                              }}
+                            >
+                              {showPassword[id] ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <span className="font-black" style={{ color: 'var(--neon-secondary)' }}>{team.total || 0}</span>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button
+                          onClick={() => handleDeleteTeam(id)}
+                          className="btn-secondary"
+                          style={{ borderColor: '#ef4444', color: '#ef4444', padding: '0.5rem 0.75rem' }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {teamCount === 0 && (
+            <div className="text-center p-12" style={{ opacity: 0.4 }}>
+              <Users size={48} className="m-auto mb-4" style={{ color: 'var(--text-dim)' }} />
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>No Squads Deployed</p>
+              <p className="text-xs mt-2" style={{ color: 'var(--text-dim)' }}>Create your first team above to get started</p>
+            </div>
+          )}
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Event State Controls */}
