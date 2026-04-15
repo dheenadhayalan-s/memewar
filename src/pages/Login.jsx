@@ -58,8 +58,17 @@ const Login = () => {
       <div className="glass-card p-10 w-full max-w-lg animate-reveal shadow-2xl">
         <div className="text-center mb-10">
             <Shield className="text-neon-cyan mb-6 m-auto" size={56} />
-            <h1 className="text-4xl font-black text-gradient italic uppercase">War Entry</h1>
+            <h1 className="text-4xl font-black text-gradient italic uppercase">Team Entry</h1>
             <p className="text-secondary text-xs font-bold tracking-widest uppercase mt-4">Authorized Personnel Only</p>
+            {localStorage.getItem('teamId') && (
+              <div className="mt-8 p-6 glass-card border-neon-cyan/20 bg-neon-cyan/5">
+                <p className="text-xs font-bold mb-4 opacity-70 italic font-medium">Logged in as Team {localStorage.getItem('teamId')}</p>
+                <div className="flex gap-4 justify-center">
+                  <button onClick={() => window.location.href = '/team'} className="btn-primary flex-1 py-3 text-[10px]">Enter Game</button>
+                  <button onClick={() => { localStorage.removeItem('teamId'); window.location.reload(); }} className="btn-secondary flex-1 py-3 text-[10px]">Switch Team</button>
+                </div>
+              </div>
+            )}
         </div>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-8">

@@ -40,12 +40,23 @@ export const resetSubmissions = () => {
 export const selectWinners = (winners) => {
   return update(ref(db, `event/rankings`), winners);
 };
+
+export const clearSessionData = () => {
+  return update(ref(db, 'event'), {
+    submissions: {},
+    template: null,
+    rankings: null,
+    submissionOpen: false
+  });
+};
+
 export const wipeProjectData = () => {
   return update(ref(db, 'event'), {
     submissions: {},
     availableTemplates: [],
     template: null,
-    rankings: null
+    rankings: null,
+    submissionOpen: false
   });
 };
 

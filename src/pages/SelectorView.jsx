@@ -66,7 +66,7 @@ const SelectorView = ({ eventData, teams }) => {
   };
 
   // Selection View
-  if (!eventData.template) {
+  if (!eventData.template || eventData.template === "") {
     const availableTemplates = eventData.availableTemplates || [];
     return (
       <div className="flex flex-col gap-8 animate-reveal">

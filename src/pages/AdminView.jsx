@@ -91,11 +91,23 @@ const AdminView = ({ eventData, teams }) => {
 
 
   const handleWipeData = async () => {
-    if (window.confirm("This will erase ALL templates and submissions. Continue?")) {
+    if (window.confirm("ARE YOU SURE? This will remove all submissions, rankings, and memes.")) {
       try {
         await wipeProjectData();
+        alert("Board Wiped Successfully");
       } catch (err) {
-        alert("Failed to wipe data");
+        alert("Wipe Failed");
+      }
+    }
+  };
+
+  const handleResetSession = async () => {
+    if (window.confirm("Reset current round progress? This clears captions and the selected meme, but keeps the meme pool.")) {
+      try {
+        await clearSessionData();
+        alert("Session Reset Successfully");
+      } catch (err) {
+        alert("Reset Failed");
       }
     }
   };
@@ -170,8 +182,11 @@ const AdminView = ({ eventData, teams }) => {
           <p className="text-secondary text-xs font-bold tracking-widest uppercase mt-2">Meme War Control Center // 2026</p>
         </div>
         <div className="flex gap-4">
+          <button onClick={handleResetSession} className="btn-secondary border-neon-cyan text-neon-cyan">
+            <Eraser size={14} /> Reset Progress
+          </button>
           <button onClick={handleWipeData} className="btn-secondary border-neon-pink text-neon-pink">
-            <Eraser size={14} /> Reset Round Data
+            <Star size={14} /> Clear Everything
           </button>
         </div>
       </header>
@@ -380,7 +395,7 @@ const AdminView = ({ eventData, teams }) => {
         {/* Round 2 Mini Round Matrix */}
         <section className="glass-card p-8 lg:col-span-2 flex flex-col gap-8">
           <h2 className="heading text-xs text-neon-primary flex items-center gap-2 uppercase"><TrendingUp size={14}/> Round 2 Settings</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="flex flex-col gap-4">
               <label className="text-xs text-secondary uppercase font-bold tracking-widest">Selector Team</label>
               <select 
@@ -389,9 +404,32 @@ const AdminView = ({ eventData, teams }) => {
                 className="w-full"
               >
                 <option value="">CHOOSE SELECTOR</option>
-                {Object.keys(teams).sort().map(id => <option key={id} value={id}>TEAM {id}</option>)}
+                {Object.keys(teams).sort((a, b) => parseInt(a) - parseInt(b)).map(id => <option key={id} value={id}>TEAM {id}</option>)}
               </select>
             </div>
+
+            <div className="p-4 border border-white border-opacity-10 rounded-xl bg-black bg-opacity-20">
+                <p className="text-[10px] text-secondary uppercase font-bold mb-2">Active Meme URL</p>
+                <div className="flex items-center gap-4">
+                  <p className="text-xs font-mono truncate text-neon-cyan flex-1">{eventData?.template || 'Not Selected'}</p>
+                  {eventData?.template && (
+                    <button 
+                      onClick={() => setEventData({ template: null, rankings: null })}
+                      className="text-neon-pink text-[10px] font-bold uppercase hover:underline"
+                    >
+                      Unset
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-4 border border-white border-opacity-10 rounded-xl bg-black bg-opacity-20">
+                <p className="text-[10px] text-secondary uppercase font-bold mb-2">Current Activity</p>
+                <p className="text-sm font-bold">
+                  {Object.keys(eventData?.submissions || {}).length} Captions Received
+                </p>
+              </div>
+          </div>
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <div className="flex gap-2">

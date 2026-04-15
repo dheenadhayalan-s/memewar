@@ -45,27 +45,29 @@ const ParticipantView = ({ eventData, teams }) => {
 
   return (
     <div className="max-w-6xl p-6 lg:p-12 flex flex-col gap-10 animate-reveal">
-      {/* Header Info */}
-      <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
-        <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-black text-gradient uppercase italic">{teamInfo.name || `Team ${teamId}`}</h1>
-            <div className="flex gap-4">
-                <span className="text-xs font-bold py-1 px-3 bg-neon-cyan opacity-20 rounded-full text-neon-cyan uppercase tracking-widest flex items-center gap-2">
-                   <Activity size={10} /> Rank #{rank}
-                </span>
-                <button 
+      <div className="w-full flex flex-col md:flex-row gap-8 justify-between items-stretch md:items-center glass-card p-4">
+        <div className="flex items-center gap-6 px-4">
+          <div className="w-14 h-14 rounded-2xl bg-neon-primary bg-opacity-20 flex items-center justify-center">
+            <User size={28} className="text-neon-primary" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-black text-gradient italic uppercase tracking-tighter leading-none">Team {teamId}</h1>
+            <div className="flex gap-4 mt-2">
+               <span className="text-[10px] text-secondary font-bold uppercase tracking-widest opacity-70">Rank #{rank}</span>
+               <button 
                   onClick={() => { localStorage.removeItem('teamId'); window.location.href = '/login'; }}
-                  className="text-xs font-bold py-1 px-3 bg-white opacity-10 hover:opacity-30 rounded-full text-white uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer"
-                >
-                   Logout
-                </button>
+                  className="text-[10px] text-red-500 font-bold uppercase tracking-widest hover:underline"
+               >
+                  Switch Team
+               </button>
             </div>
+          </div>
         </div>
         
-        <div className="glass-card p-6 min-w-[200px] flex justify-between items-center">
-           <div>
-              <p className="text-xs text-secondary font-bold uppercase tracking-widest mb-1">Combat Power</p>
-              <p className="text-4xl font-black text-neon-primary">{teamInfo.total}</p>
+        <div className="flex items-center gap-8 px-8 py-2 bg-white bg-opacity-[0.02] rounded-2xl border border-white border-opacity-5">
+           <div className="text-right">
+              <p className="text-[10px] text-secondary font-black uppercase tracking-widest opacity-40">Squad Power</p>
+              <p className="text-4xl font-black text-neon-primary tabular-nums">{teamInfo.total}</p>
            </div>
            <Zap className="text-neon-primary" size={32} />
         </div>
