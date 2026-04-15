@@ -111,10 +111,12 @@ const AdminView = ({ eventData, teams }) => {
   };
 
   const handleDeleteAllTeams = async () => {
-    if (!window.confirm('DELETE ALL TEAMS? This will remove every team and their scores. This cannot be undone!')) return;
-    if (!window.confirm('Are you absolutely sure? Type thinking...')) return;
+    if (!window.confirm('DELETE ALL TEAMS? This will remove every team and every past submission/round record. This cannot be undone!')) return;
+    if (!window.confirm('Wipe everything for a clean start? Type thinking...')) return;
     try {
       await deleteAllTeams();
+      await wipeProjectData();
+      await resetSubmissions();
     } catch (err) {
       alert('Failed to delete all teams');
     }

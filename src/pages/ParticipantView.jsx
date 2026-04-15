@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { submitCaption } from '../firebase';
 import { Trophy, Send, Clock, User, Zap, Activity, ImageIcon } from 'lucide-react';
 import SelectorView from './SelectorView';
@@ -8,6 +8,16 @@ const ParticipantView = ({ eventData, teams }) => {
   const teamId = localStorage.getItem('teamId');
   const [caption, setCaption] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If teams have been loaded from Firebase but our ID isn't in there,
+    // it means the team was deleted by the admin. Force a logout.
+    if (teamId && teams && Object.keys(teams).length > 0 && !teams[teamId]) {
+      localStorage.removeItem('teamId');
+      navigate('/login');
+    }
+  }, [teamId, teams, navigate]);
 
   if (!teamId) return <Navigate to="/login" />;
 
@@ -38,7 +48,7 @@ const ParticipantView = ({ eventData, teams }) => {
       {/* Header Info */}
       <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
         <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-black text-gradient uppercase italic">Team {teamId}</h1>
+            <h1 className="text-4xl font-black text-gradient uppercase italic">{teamInfo.name || `Team ${teamId}`}</h1>
             <div className="flex gap-4">
                 <span className="text-xs font-bold py-1 px-3 bg-neon-cyan opacity-20 rounded-full text-neon-cyan uppercase tracking-widest flex items-center gap-2">
                    <Activity size={10} /> Rank #{rank}
@@ -47,7 +57,7 @@ const ParticipantView = ({ eventData, teams }) => {
                   onClick={() => { localStorage.removeItem('teamId'); window.location.href = '/login'; }}
                   className="text-xs font-bold py-1 px-3 bg-white opacity-10 hover:opacity-30 rounded-full text-white uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer"
                 >
-                   Switch Squad
+                   Logout
                 </button>
             </div>
         </div>
