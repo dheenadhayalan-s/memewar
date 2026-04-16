@@ -78,14 +78,14 @@ const AdminView = ({ eventData, teams }) => {
   }
 
   const saveR1Score = (teamId) => {
-    const { correct = 0, skip = 0 } = r1Scores[teamId] || {};
-    const score = (correct * 5) - Math.abs(skip);
+    const { correct = 0 } = r1Scores[teamId] || {};
+    const score = Number(correct);
     updateTeamScore(teamId, { ...teams[teamId], r1: score });
   };
 
   const saveR3Score = (teamId) => {
-    const { humor = 0, creative = 0, relevance = 0 } = r3Scores[teamId] || {};
-    const score = Number(humor) + Number(creative) + Number(relevance);
+    const { points = 0 } = r3Scores[teamId] || {};
+    const score = Number(points);
     updateTeamScore(teamId, { ...teams[teamId], r3: score });
   };
 
@@ -547,8 +547,7 @@ const AdminView = ({ eventData, teams }) => {
               <thead>
                 <tr>
                   <th>Team</th>
-                  <th>Correct (x5)</th>
-                  <th>Skips</th>
+                  <th>Points</th>
                   <th>Save</th>
                 </tr>
               </thead>
@@ -557,7 +556,6 @@ const AdminView = ({ eventData, teams }) => {
                   <tr key={id}>
                     <td className="font-bold text-neon-cyan">Team {id}</td>
                     <td><input type="number" value={r1Scores[id]?.correct || 0} onChange={(e) => setR1Scores({ ...r1Scores, [id]: { ...r1Scores[id], correct: e.target.value }})} className="w-20" /></td>
-                    <td><input type="number" value={r1Scores[id]?.skip || 0} onChange={(e) => setR1Scores({ ...r1Scores, [id]: { ...r1Scores[id], skip: e.target.value }})} className="w-20" /></td>
                     <td><button onClick={() => saveR1Score(id)} className="btn-secondary"><Save size={16} /></button></td>
                   </tr>
                 ))}
@@ -576,9 +574,7 @@ const AdminView = ({ eventData, teams }) => {
               <thead>
                 <tr>
                   <th>Team</th>
-                  <th>Humor (20)</th>
-                  <th>Creativity (20)</th>
-                  <th>Relevance (10)</th>
+                  <th>Points (Out of 20)</th>
                   <th>Save</th>
                 </tr>
               </thead>
@@ -586,9 +582,7 @@ const AdminView = ({ eventData, teams }) => {
                 {Object.keys(teams).sort().map(id => (
                   <tr key={id}>
                     <td className="font-bold text-neon-pink">Team {id}</td>
-                    <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], humor: e.target.value}})} className="w-16" /></td>
-                    <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], creativity: e.target.value}})} className="w-16" /></td>
-                    <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], relevance: e.target.value}})} className="w-16" /></td>
+                    <td><input type="number" onChange={(e) => setR3Scores({...r3Scores, [id]: {...r3Scores[id], points: e.target.value}})} className="w-16" /></td>
                     <td><button onClick={() => saveR3Score(id)} className="btn-secondary"><Save size={16} /></button></td>
                   </tr>
                 ))}
