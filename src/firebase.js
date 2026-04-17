@@ -3,7 +3,7 @@ import { getDatabase, ref, onValue, set, update, push, remove } from "firebase/d
 
 // REPLACE WITH YOUR FIREBASE CONFIG
 const firebaseConfig = {
-  apiKey: "AIzaSyBXjB9vDM6qOht39i1LWcb6cQn2VA7Od4o",
+  apiKey: "YOUR_API_KEY",
   authDomain: "meme-war-b7dfe.firebaseapp.com",
   projectId: "meme-war-b7dfe",
   storageBucket: "meme-war-b7dfe.firebasestorage.app",
